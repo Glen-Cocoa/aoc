@@ -7,8 +7,26 @@ defmodule Extractor do
     input
       |> clean_numbers()
       |> Enum.map(&parse_number/1)
+      |> Enum.map(&break_numbers/1)
+      |> List.flatten()
+      |> Enum.map(&numberify/1)
       |> first_and_last()
   end
+
+  defp numberify(char) when is_binary(char) do
+    String.to_integer(char)
+  end
+
+  defp numberify(char) when is_integer(char), do: char
+
+  defp break_numbers(num) when is_binary(num) do
+    case String.length(num) > 1 do
+      true -> Integer.digits(String.to_integer(num))
+      false -> num
+    end
+  end
+
+  defp break_numbers(num), do: num
 
   defp clean_numbers(input) do
     Regex.scan(~r/(zero|one|two|three|four|five|six|seven|eight|nine|\d+)/, input)
@@ -17,12 +35,11 @@ defmodule Extractor do
 
   defp parse_number(str) do
     case Map.get(@numbers, String.downcase(str)) do
-      nil -> String.to_integer(str)
+      nil -> str
       value -> value
       end
     end
 
-  defp first_and_last(""), do: ""
   defp first_and_last(numbers), do: "#{Enum.at(numbers, 0)}#{Enum.at(numbers, -1)}"
 end
 
