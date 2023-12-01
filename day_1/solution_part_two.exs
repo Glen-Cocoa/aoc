@@ -20,9 +20,10 @@ defmodule Extractor do
   defp numberify(char) when is_integer(char), do: char
 
   defp break_numbers(num) when is_binary(num) do
-    case String.length(num) > 1 do
-      true -> Integer.digits(String.to_integer(num))
-      false -> num
+    if String.length(num) > 1 do
+      Integer.digits(String.to_integer(num))
+    else
+      num
     end
   end
 
